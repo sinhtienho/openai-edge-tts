@@ -73,6 +73,19 @@ def generate_sse_audio_stream(text, voice, speed):
 def text_to_speech():
     try:
         data = request.json
+        # --- BẮT ĐẦU ĐOẠN MAP DỮ LIỆU ĐỂ HỖ TRỢ BẢN CHẤT CỦA LERNKIT ---
+        if data and 'text' in data and 'audio' in data:
+            audio_config = data.get('audio', {})
+            # Trích xuất cấu trúc dị biệt của LearnKit và map phẳng lại về chuẩn OpenAI
+            data = {
+                'input': data.get('text'),
+                'voice': audio_config.get('ttsVoiceId', DEFAULT_VOICE),
+                'model': audio_config.get('ttsModel', 'tts-1'),
+                'response_format': audio_config.get('responseFormat', DEFAULT_RESPONSE_FORMAT),
+                'speed': audio_config.get('speed', DEFAULT_SPEED)
+            }
+        # --- KẾT THÚC ĐOẠN MAP DỮ LIỆU ---
+        
         if not data or 'input' not in data:
             return jsonify({"error": "Missing 'input' in request body"}), 400
 
